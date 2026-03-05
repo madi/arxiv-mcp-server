@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>arXiv MCP Server — Search Academic Papers with AI</title>
+  <meta name="description" content="Turn arXiv into a conversation. Search and analyze academic papers directly from Claude, ChatGPT, or any MCP-compatible AI assistant.">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --fg: #1a1a1a;
+      --muted: #666;
+      --accent: #b31b1b; /* arXiv red */
+      --accent-light: #fef2f2;
+      --border: #e5e5e5;
+      --card-bg: #fff;
+      --code-bg: #f5f5f5;
+      --radius: 8px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 60px;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+    .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { text-decoration: none; opacity: 0.9; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-secondary { background: var(--card-bg); color: var(--fg); border: 1px solid var(--border); }
+
+    /* Sections */
+    section { padding: 60px 0; }
+    section h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    section > .container > p.subtitle {
+      color: var(--muted);
+      margin-bottom: 32px;
+      font-size: 1.05rem;
+    }
+
+    /* Tools grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    .tool-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .tool-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--accent);
+    }
+    .tool-card p { color: var(--muted); font-size: 0.95rem; }
+
+    /* Install options */
+    .install-options { display: flex; flex-direction: column; gap: 24px; }
+    .install-option {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .install-option h3 { font-size: 1.1rem; margin-bottom: 4px; }
+    .install-option .label {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .install-option p { color: var(--muted); font-size: 0.95rem; margin-bottom: 12px; }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    }
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9em;
+    }
+    p code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Example */
+    .example-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .example-box .prompt {
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 16px;
+      padding-left: 16px;
+      border-left: 3px solid var(--accent);
+    }
+    .example-box .response { font-size: 0.95rem; }
+    .example-box .response strong { color: var(--accent); }
+
+    /* Use cases */
+    .use-cases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .use-case {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+    }
+    .use-case .emoji { font-size: 1.5rem; margin-bottom: 8px; }
+    .use-case h3 { font-size: 0.95rem; margin-bottom: 4px; }
+    .use-case p { font-size: 0.85rem; color: var(--muted); }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+      padding: 60px 24px;
+      background: var(--accent-light);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .cta h2 { margin-bottom: 16px; }
+    .cta p { color: var(--muted); margin-bottom: 24px; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--accent); }
+    footer .links { margin-bottom: 12px; }
+    footer .links a { margin: 0 12px; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero p { font-size: 1rem; }
+      section h2 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1><span>arXiv</span> MCP Server</h1>
+    <p>Search and analyze academic papers directly from Claude, ChatGPT, or any MCP-compatible AI assistant.</p>
+    <div class="hero-buttons">
+      <a href="#install" class="btn btn-primary">Get Started</a>
+      <a href="https://github.com/madi/arxiv-mcp-server" class="btn btn-secondary">View on GitHub</a>
+    </div>
+  </header>
+
+  <!-- Tools -->
+  <section>
+    <div class="container">
+      <h2>Available Tools</h2>
+      <p class="subtitle">Three tools that give your AI assistant full access to arXiv's academic corpus.</p>
+      <div class="tools-grid">
+        <div class="tool-card">
+          <h3>search_papers</h3>
+          <p>Search papers by keywords, topic, or author. Returns titles, authors, abstracts, and links — sorted by relevance or date.</p>
+        </div>
+        <div class="tool-card">
+          <h3>get_paper</h3>
+          <p>Get full details of any paper by its arXiv ID. Includes abstract, all authors, categories, and PDF link.</p>
+        </div>
+        <div class="tool-card">
+          <h3>search_by_category</h3>
+          <p>Browse papers by arXiv category — cs.AI, cs.LG, stat.ML, and hundreds more. Filter with optional keywords.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section id="install" style="background: var(--accent-light);">
+    <div class="container">
+      <h2>Get Started</h2>
+      <p class="subtitle">Choose the setup that works for you.</p>
+      <div class="install-options">
+
+        <div class="install-option">
+          <h3>Hosted Endpoint</h3>
+          <span class="label">No install needed</span>
+          <p>Add this URL to Claude.ai (Settings &rarr; Integrations &rarr; Add MCP Server) or any MCP client:</p>
+          <pre>https://arxiv-mcp-server.dileomargherita.workers.dev/mcp</pre>
+        </div>
+
+        <div class="install-option">
+          <h3>Claude Desktop</h3>
+          <span class="label">Local</span>
+          <p>Add to your Claude Desktop config file (<code>claude_desktop_config.json</code>):</p>
+          <pre>{
+  "mcpServers": {
+    "arxiv": {
+      "command": "npx",
+      "args": ["arxiv-mcp-server"]
+    }
+  }
+}</pre>
+        </div>
+
+        <div class="install-option">
+          <h3>VS Code / Cursor</h3>
+          <span class="label">Local</span>
+          <p>Add to your MCP settings:</p>
+          <pre>{
+  "mcpServers": {
+    "arxiv": {
+      "command": "npx",
+      "args": ["arxiv-mcp-server"]
+    }
+  }
+}</pre>
+        </div>
+
+        <div class="install-option">
+          <h3>Self-hosted (Cloudflare Workers)</h3>
+          <span class="label">Deploy your own</span>
+          <p>Clone, build, and deploy to your own Cloudflare account:</p>
+          <pre>git clone https://github.com/madi/arxiv-mcp-server
+cd arxiv-mcp-server
+npm install
+wrangler login
+wrangler deploy</pre>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Example -->
+  <section>
+    <div class="container">
+      <h2>See It in Action</h2>
+      <p class="subtitle">Just ask your AI assistant about papers — it handles the rest.</p>
+      <div class="example-box">
+        <p class="prompt">"Find recent papers on AI policy and regulation"</p>
+        <div class="response">
+          <p><strong>1. Enhancing Human-Like Responses in Large Language Models</strong><br>
+          Ethem Yağız Çalık, Talha Rüzgar Akkuş — 2025-01-09 — cs.CL, cs.AI<br>
+          This paper explores the advancements in making large language models more human-like...</p>
+          <br>
+          <p><strong>2. Is Self-knowledge and Action Consistent or Not</strong><br>
+          Yiming Ai, Zhiwei He, Ziyin Zhang +5 more — 2024-02-22 — cs.CL, cs.CY<br>
+          In this study, we delve into the validity of conventional personality questionnaires...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section style="background: var(--accent-light);">
+    <div class="container">
+      <h2>Perfect For</h2>
+      <p class="subtitle">Anyone who reads or works with academic papers.</p>
+      <div class="use-cases">
+        <div class="use-case">
+          <div class="emoji">🔬</div>
+          <h3>Researchers</h3>
+          <p>Stay on top of your field without endless browsing</p>
+        </div>
+        <div class="use-case">
+          <div class="emoji">📊</div>
+          <h3>Data Scientists</h3>
+          <p>Find methods and benchmarks from the latest papers</p>
+        </div>
+        <div class="use-case">
+          <div class="emoji">🎓</div>
+          <h3>Students</h3>
+          <p>Discover relevant papers for your thesis or coursework</p>
+        </div>
+        <div class="use-case">
+          <div class="emoji">📰</div>
+          <h3>Journalists</h3>
+          <p>Find and understand academic sources for your stories</p>
+        </div>
+        <div class="use-case">
+          <div class="emoji">🏛️</div>
+          <h3>Policy Analysts</h3>
+          <p>Track research trends in AI, climate, health, and more</p>
+        </div>
+        <div class="use-case">
+          <div class="emoji">💻</div>
+          <h3>Developers</h3>
+          <p>Learn how to build MCP servers from a clean example</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>Ready to search arXiv with AI?</h2>
+    <p>Add the server in one click — no install, no API key, completely free.</p>
+    <div class="hero-buttons">
+      <a href="#install" class="btn btn-primary">Get Started</a>
+      <a href="https://github.com/madi/arxiv-mcp-server" class="btn btn-secondary">View on GitHub</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="links">
+      <a href="https://github.com/madi/arxiv-mcp-server">GitHub</a>
+      <a href="https://modelcontextprotocol.io">MCP Protocol</a>
+      <a href="https://arxiv.org">arXiv</a>
+    </div>
+    <p>MIT License &middot; Built as an open-source case study for AI-ready data</p>
+  </footer>
+
+</body>
+</html>

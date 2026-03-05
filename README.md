@@ -19,7 +19,7 @@ Built as a case study demonstrating how an open academic API can be exposed as a
 Add this URL to Claude Desktop Settings → Integrations, or to Claude.ai:
 
 ```
-https://arxiv-mcp-server.madi.workers.dev/mcp
+https://arxiv-mcp-server.dileomargherita.workers.dev/mcp
 ```
 
 ### Option 2 — Local via npx (requires Node.js)
@@ -70,7 +70,7 @@ wrangler login
 wrangler deploy
 ```
 
-Your server will be live at `https://arxiv-mcp-server.madi.workers.dev`.
+Your server will be live at `https://arxiv-mcp-server.dileomargherita.workers.dev`.
 
 ## Example Usage in Claude Desktop
 
