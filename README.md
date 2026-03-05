@@ -2,7 +2,7 @@
 
 An MCP (Model Context Protocol) server for searching and analyzing academic papers on arXiv.
 
-Built as a case study for the JRC AI-readiness framework, demonstrating how an open academic API can be exposed as an AI-ready asset through the MCP protocol.
+Built as a case study demonstrating how an open academic API can be exposed as an AI-ready asset through the MCP protocol.
 
 ## Available Tools
 
@@ -105,7 +105,7 @@ arxiv-mcp-server/
 
 ## Why This Is an AI-Ready Asset
 
-This server demonstrates the full asset chain from the JRC AI-readiness framework:
+This server demonstrates the full asset chain of an AI-ready ecosystem:
 
 ```
 Data (arXiv corpus)
